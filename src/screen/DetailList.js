@@ -1,5 +1,5 @@
 import { FontAwesome } from "@expo/vector-icons";
-import { Box, Button, Image, Text } from "native-base";
+import { Box, Button, Image, Text, Stack, VStack, HStack, FlatList } from "native-base";
 import { showMessage } from "react-native-flash-message";
 import { useQuery } from "react-query";
 import ChecklistImage from "../../assets/checklist.png";
@@ -8,11 +8,20 @@ import { API } from "../../config/api";
 function DetailList({ route, navigation }) {
   let { listId, listBgColor, categoryBgColor, categoryName } = route.params;
 
-  let { data: list, refetch: listRefetch } = useQuery(
+  let { data: listDetail, refetch: listDetailRefetch } = useQuery(
     "listDetailCaches",
     async () => {
       let listResponse = await API.get(`/List/${listId}`);
       // console.log("response list detail", listResponse.data);
+      return listResponse.data;
+    }
+  );
+
+  let { data: list, refetch: listRefetch } = useQuery(
+    "listCaches",
+    async () => {
+      let listResponse = await API.get("/List");
+      // console.log("response list", listResponse.data);
       return listResponse.data;
     }
   );
@@ -62,6 +71,7 @@ function DetailList({ route, navigation }) {
         { is_done: current_status == 0 ? 1 : 0 },
         { validateStatus: () => true }
       );
+      listDetailRefetch();
       listRefetch();
     } catch (err) {
       // console.log(err);
@@ -73,94 +83,89 @@ function DetailList({ route, navigation }) {
   }
 
   return (
-    <Box display="flex" flex={1} alignItems="center" bg="white">
-      <Box
-        // intinya dia ngambil dari data todo color kita find ngecompare index sama index item terus di modulus banyaknya todoColor
-        // object keys itu ngambil banyaknya length terus di - 1 biar modulus 4, jadi loop balik ke index awal lagi
-        bg={listBgColor}
-        w={"90%"}
-        p={10}
-        borderRadius={10}
-        display="flex"
-        flexDirection="row"
-        mx={5}
-        my={5}
-      >
-        <Box flex={2} h={650}>
+    <Box maxH={"82%"}>
+    <Stack m={"3"} w={"93%"} rounded="sm" bg={listBgColor} pb={5}>
+      <HStack justifyContent={"space-between"} p="3" pb={0}>
+        <Box justifyContent={"center"} w={"50%"}>
           <Text
+            fontSize={"3xl"}
             fontWeight="bold"
-            fontSize={20}
-            textDecorationLine={list?.is_done == 0 ? "none" : "line-through"}
+            textDecorationLine={listDetail?.is_done == 0 ? "none" : "line-through"}
           >
-            {list?.name}
+            {listDetail?.name}
           </Text>
-          <Text color="muted.500" display="flex" alignItems="center">
-            <FontAwesome
-              name="calendar"
-              size={15}
-              color="muted.500"
-              style={{ marginRight: 5 }}
-            />
-            {milisToDate(list?.date)}
-          </Text>
+
           <Text
-            mt={5}
-            color="muted.500"
-            flex={1}
-            textDecorationLine={list?.is_done == 0 ? "none" : "line-through"}
+            textDecorationLine={listDetail?.is_done == 0 ? "none" : "line-through"}
           >
-            {list?.description}
+            {milisToDate(listDetail?.date)}
           </Text>
         </Box>
-        <Box flex={1}>
+        <VStack w="32" mt={"3"} space="2">
           <Box
             p={1}
             borderRadius={10}
             display="flex"
             alignItems="center"
             justifyContent="center"
-            // intinya dia ngambil dari data todo color kita find ngecompare index sama index item terus di modulus banyaknya todoColor
-            // object keys itu ngambil banyaknya length terus di - 1 biar modulus 4, jadi loop balik ke index awal lagi
             bg={categoryBgColor}
           >
             <Text color="white" fontWeight="bold">
-              {/* intinya nyari id category yang sama terus return namenya aja kalau ketemu jadi pake find */}
               {categoryName}
             </Text>
-            <Button
-              alignContent="center"
-              bg={list?.is_done ? "white" : "muted.200"}
-              borderRadius={100}
-              _hover={{ backgroundColor: "muted.300" }}
-              _pressed={{ backgroundColor: "muted.400" }}
-              w={10}
-              h={10}
-              onPress={(e) => handleUpdateIsDone(e, list?._id, list?.is_done)}
-            >
-              {list?.is_done ? (
-                <Image
-                  source={ChecklistImage}
-                  w={8}
-                  h={8}
-                  resizeMode="contain"
-                  alt="ChecklistImage"
-                />
-              ) : (
-                <></>
-              )}
-            </Button>
           </Box>
-          <Box
-            flex={1}
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
+          <Button
+            bg={listBgColor}
+            borderRadius={100}
+            _hover={{ backgroundColor: { listBgColor } }}
+            _pressed={{ backgroundColor: { listBgColor } }}
+            mt={2}
+            onPress={(e) => handleUpdateIsDone(e, listDetail?._id, listDetail?.is_done)}
           >
-            {/* intinya buat ngatur buttonnya udah di klik belum, kalau udah ada checklistnya kalau belum ilangin */}
-          </Box>
-        </Box>
-      </Box>
-    </Box>
+            {listDetail?.is_done ? (
+              <Image
+                source={ChecklistImage}
+                w={50}
+                h={50}
+                resizeMode="contain"
+                alt="ChecklistImage"
+              />
+            ) : (
+              <>
+                <Button
+                  bg={listDetail?.is_done ? "white" : "muted.200"}
+                  borderRadius={100}
+                  _hover={{ backgroundColor: "muted.300" }}
+                  _pressed={{ backgroundColor: "muted.400" }}
+                  w={50}
+                  h={50}
+                  onPress={(e) =>
+                    handleUpdateIsDone(e, list?._id, list?.is_done)
+                  }
+                ></Button>
+              </>
+            )}
+          </Button>
+        </VStack>
+      </HStack>
+      <FlatList
+        showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          <Text
+            fontSize={"xs"}
+            m="3"
+            color={"gray.600"}
+            textDecorationLine={listDetail?.is_done == 0 ? "none" : "line-through"}
+          >
+            {listDetail?.description}
+          </Text>
+        }
+        renderItem={() => {
+          listDetail?.description
+        }}
+      />
+    </Stack>
+  </Box>
   );
 }
 

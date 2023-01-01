@@ -1,4 +1,13 @@
-import { Box, Button, Input, Select, Text, TextArea, Pressable, HStack } from "native-base";
+import {
+  Box,
+  Button,
+  Input,
+  Select,
+  Text,
+  TextArea,
+  Pressable,
+  HStack,
+} from "native-base";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
@@ -47,6 +56,15 @@ function AddList({ navigation }) {
       let categoryResponse = await API.get("/Category");
       // console.log("category list", categoryResponse.data);
       return categoryResponse.data;
+    }
+  );
+
+  let { data: list, refetch: listRefetch } = useQuery(
+    "listCaches",
+    async () => {
+      let listResponse = await API.get("/List");
+      // console.log("response list", listResponse.data);
+      return listResponse.data;
     }
   );
 
@@ -104,6 +122,7 @@ function AddList({ navigation }) {
         category_id: "",
         is_done: 0,
       });
+      listRefetch();
     } catch (err) {
       showMessage({
         message: "Failed to add List!",
