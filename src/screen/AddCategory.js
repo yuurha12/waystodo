@@ -139,7 +139,6 @@ function AddCategory({ navigation }) {
                 mr={2}
                 my={2}
                 h={12}
-                w={20}
                 // take from category color
                 // object keys taking from lenght then - 1 for modulus keep on 4, so loop to base index again
                 bg={
