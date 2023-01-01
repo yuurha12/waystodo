@@ -140,7 +140,7 @@ function DetailList({ route, navigation }) {
                   w={50}
                   h={50}
                   onPress={(e) =>
-                    handleUpdateIsDone(e, list?._id, list?.is_done)
+                    handleUpdateIsDone(e, listDetail?._id, listDetail?.is_done)
                   }
                 ></Button>
               </>
