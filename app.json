@@ -2,7 +2,7 @@
   "expo": {
     "name": "waystodo",
     "slug": "waystodo-v2",
-    "version": "1.1.1a",
+    "version": "1.1.1b",
     "orientation": "portrait",
     "icon": "./assets/notes.png",
     "splash": {
