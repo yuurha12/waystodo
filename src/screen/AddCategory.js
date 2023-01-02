@@ -1,4 +1,5 @@
-import { Box, Button, Input, Text } from "native-base";
+import { AntDesign } from "@expo/vector-icons";
+import { Box, Button, HStack, Input, Text } from "native-base";
 import { useState } from "react";
 import { showMessage } from "react-native-flash-message";
 import { useMutation, useQuery } from "react-query";
@@ -27,7 +28,7 @@ function AddCategory({ navigation }) {
   const categoryColor = [
     {
       index: 0,
-      bgColor: "primary.500",
+      bgColor: "danger.500",
     },
     {
       index: 1,
@@ -39,7 +40,7 @@ function AddCategory({ navigation }) {
     },
     {
       index: 3,
-      bgColor: "danger.500",
+      bgColor: "primary.500",
     },
     {
       index: 4,
@@ -47,6 +48,7 @@ function AddCategory({ navigation }) {
     },
   ];
 
+  
   const handleSubmit = useMutation(async (e) => {
     e.preventDefault();
     try {
@@ -73,11 +75,25 @@ function AddCategory({ navigation }) {
       });
     }
   });
+  
+  async function handleDelete(e, category_id) {
+
+    try {
+      await API.delete(`/Category/${category_id}`);
+      categoryRefetch();
+    } catch (err) {
+      showMessage({
+        message: "failed to delete!",
+        type: "danger",
+      });
+    }
+  }
+
 
   return (
     <Box
-      display="flex"
-      flex={1}
+    display="flex"
+    flex={1}
       bg="white"
       px={3}
       py={5}
@@ -132,6 +148,7 @@ function AddCategory({ navigation }) {
               <Box
                 p={3}
                 borderRadius={10}
+                flexDirection="row"
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
@@ -144,7 +161,7 @@ function AddCategory({ navigation }) {
                 bg={
                   categoryColor?.find(
                     (item) =>
-                      item?.index === i % (categoryColor.length)
+                      item?.index === i % (Object.keys(categoryColor).length - 1)
                   ).bgColor
                 }
               >
@@ -154,6 +171,10 @@ function AddCategory({ navigation }) {
                   {/* find same id category  then return name */}
                   {item.name}
                 </Text>
+                <HStack>
+                <AntDesign name="close" size={25} color="white"
+                onPress={(e) => handleDelete(e, item._id)}/>
+                </HStack>
               </Box>
             );
           })}

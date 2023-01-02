@@ -41,23 +41,23 @@ function Home({ navigation }) {
   const todoColor = [
     {
       index: 0,
-      bgColor: "primary.200",
-    },
-    {
-      index: 1,
-      bgColor: "green.200",
-    },
-    {
-      index: 2,
       bgColor: "danger.200",
     },
     {
+      index: 1,
+      bgColor: "purple.200",
+    },
+    {
+      index: 2,
+      bgColor: "green.200",
+    },
+    {
       index: 3,
-      bgColor: "warning.200",
+      bgColor: "primary.200",
     },
     {
       index: 4,
-      bgColor: "purple.200",
+      bgColor: "warning.200",
     },
   ];
 
@@ -171,9 +171,23 @@ function Home({ navigation }) {
     }
   }
 
+  async function handleDelete(e, id_todo, current_status) {
+    e.preventDefault();
+    try {
+      // delete list
+      await API.delete(`/List/${id_todo}`);
+      listRefetch();
+    } catch (err) {
+      showMessage({
+        message: "failed to delete!",
+        type: "danger",
+      });
+    }
+  }
+
   useEffect(() => {
     listRefetch();
-  },[]);
+  }, []);
 
   function TodoComponent(item, i) {
     // dipisah buat nyari bg color dari index intinya
@@ -282,6 +296,12 @@ function Home({ navigation }) {
             </Button>
           </Box>
         </Box>
+        <AntDesign
+          name="close"
+          size={30}
+          color="red"
+          onPress={(e) => handleDelete(e, item._id)}
+        />
       </Pressable>
     );
   }
